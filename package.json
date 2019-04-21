@@ -1,0 +1,28 @@
+{
+  "name": "wage-calculation",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "engines": {
+    "node": "6.16.0"
+  },
+  "engineStrict": true,
+  "dependencies": {
+    "acorn": "^6.1.1",
+    "cookie-parser": "~1.4.3",
+    "csvtojson": "^2.0.8",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "morgan": "~1.9.0",
+    "pug": "^2.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-import": "^2.17.2"
+  }
+}

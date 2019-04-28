@@ -1,10 +1,10 @@
-const createError = require('http-errors')
-const express = require('express')
-const path = require('path')
-const cookieParser = require('cookie-parser')
-const logger = require('morgan')
+import cookieParser from 'cookie-parser'
+import express from 'express'
+import createError from 'http-errors'
+import logger from 'morgan'
+import path from 'path'
 
-const indexRouter = require('./routes/index')
+import indexRouter from './src/routes/index'
 
 const app = express()
 
@@ -36,4 +36,4 @@ app.use((err, req, res) => {
   res.render('error')
 })
 
-module.exports = app
+app.listen(3000, () => console.log('App is running on port 3000!'))

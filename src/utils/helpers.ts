@@ -1,40 +1,46 @@
-const express = require('express')
-const path = require('path')
-const differenceInHours = require('date-fns/difference_in_hours')
-const format = require('date-fns/format')
-const getHours = require('date-fns/get_hours')
+import differenceInHours from 'date-fns/difference_in_hours'
+import format from 'date-fns/format'
+import getHours from 'date-fns/get_hours'
 
-const csvFilePath = path.join(__dirname, '../data/HourList.csv')
-const csv = require('csvtojson')
+export type Shift = {
+  'Person Name': string,
+  'Person ID': string,
+  Date: string,
+  Start: string,
+  End: string,
+}
 
-const router = express.Router()
+export type Employee = {
+  employeeId: string,
+  employeeName: string,
+  monthlyWage: string,
+  monthlyOvertime: number,
+}
 
 // TODO: Move helper functions into it's own file
- const normalizeTime = (timeString) => {
+const normalizeTime = (timeString: string) => {
   const splitTime = timeString.split(':')
-  const hours = splitTime[0] < 10 ? `0${splitTime[0]}` : splitTime[0]
+  const hours = parseInt(splitTime[0], 10) < 10 ? `0${splitTime[0]}` : splitTime[0]
   const minutes = splitTime[1]
 
   return `${hours}:${minutes}`
 }
 
-const formatter = (locale, currency) => {
+const formatter = (locale: string, currency: string) => {
   return new Intl.NumberFormat(locale, {
-    style: 'currency',
     currency,
-    minimumFractionDigits: 2
+    minimumFractionDigits: 2,
+    style: 'currency'
   })
-} 
+}
 
-const getOvertimeWageRate = (overtimeHours, baseRate) => {
+const getOvertimeWageRate = (overtimeHours: number, baseRate: number) => {
   // TODO: fix overtime rate for 3 and more time of overtime
   return overtimeHours * baseRate * 0.25
 }
 
-
-const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
+const calculateDailyWage = (endDateTime: string, startDayTime: string, hoursWorked: number) => {
   // Calculate regular hours pay
-  
   const startingHour = getHours(startDayTime)
   const endingHour = getHours(endDateTime)
   const baseRate = 4.25
@@ -61,7 +67,7 @@ const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
       eveningBeforeSix = 6 - startingHour
       regularDailyHours -= eveningBeforeSix
     }
-  } 
+  }
 
   // Case where shift ends afer 19
   if (endingHour > 18) {
@@ -72,7 +78,7 @@ const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
     } else {
       eveningAfterSeven = endingHour - 19
       regularDailyHours -= eveningAfterSeven
-    }   
+    }
   }
 
   const eveningHours = eveningBeforeSix + eveningAfterSeven
@@ -83,11 +89,12 @@ const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
   return {compensationForTheShift, overtimeHours}
 }
 
-const handleData = shifts => {
+export const handleData = (shifts: Array<Shift>) => {
+  console.log(shifts)
   // Get list on unique employee id
   const uniqueIDs = [...new Set(shifts.map(shift => shift['Person ID']))]
 
-  const employeeData = []
+  const employeeData: Array<Employee> = []
 
   uniqueIDs.forEach(id => {
     // Getting all the shifts for each employee
@@ -95,14 +102,14 @@ const handleData = shifts => {
       return shift['Person ID'] === id
     })
 
-    const monthlyTotalWage = []
-    const monthlyTotalOvertimeHours = []
+    const monthlyTotalWage: Array<number> = []
+    const monthlyTotalOvertimeHours: Array<number> = []
 
     employeeShifts.forEach(({Date: shiftDate, Start: shiftStart, End: shiftEnd}) => {
       const splitDate = shiftDate.split('.')
       const year = splitDate[2]
-      const month = splitDate[1] < 10 ? `0${splitDate[1]}` : splitDate[1]
-      const day = splitDate[0] < 10 ? `0${splitDate[0]}` : splitDate[0] 
+      const month = parseInt(splitDate[1], 10) < 10 ? `0${splitDate[1]}` : splitDate[1]
+      const day = parseInt(splitDate[0], 10) < 10 ? `0${splitDate[0]}` : splitDate[0]
 
       const startTime = normalizeTime(shiftStart)
       const endTime = normalizeTime(shiftEnd)
@@ -122,7 +129,7 @@ const handleData = shifts => {
 
       const hoursWorked = differenceInHours(endDateTime, startDayTime)
       const regularDailyWage = calculateDailyWage(endDateTime, startDayTime, hoursWorked)
-      
+
       monthlyTotalWage.push(regularDailyWage.compensationForTheShift)
       monthlyTotalOvertimeHours.push(regularDailyWage.overtimeHours)
     })
@@ -136,39 +143,7 @@ const handleData = shifts => {
       monthlyWage: formatter('en-US', 'USD').format(monthlyWage),
       monthlyOvertime
     })
-    
-
-
-    /**
-     * rreturn shape:
-     * 
-     * [
-     *  {
-     *    personId: 1,
-     *    pesonName: 'Name',
-     *    wages: [
-     *      totalWage: 1000,
-     *      overtimeCompensation: 200,
-     *    ]
-     *  },
-     * ]
-     *
-    */
-
   })
 
   return employeeData
 }
-
-/* GET home page. */
-router.get('/', (req, res) => {
-  csv({ignoreEmpty: true})
-    .fromFile(csvFilePath)
-    .then(json => {
-      res.render('index', {title: 'Express', data: handleData(json)})
-    }).catch((error) => {
-      res.render('error', {error})
-    })
-})
-
-module.exports = router

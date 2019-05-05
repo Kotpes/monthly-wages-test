@@ -22,5 +22,5 @@ Used [Express generator](https://expressjs.com/en/starter/generator.html) to set
 
 [Jest](https://jestjs.io/en/) (together with [ts-node](https://github.com/TypeStrong/ts-node)) was chose for unit tests
 
-Used [pug](https://pugjs.org/api/getting-started.html)for the first time, as setting up React or something felt like overkill for this task
+Used [pug](https://pugjs.org/api/getting-started.html) for the first time, as setting up React or something felt like overkill for this task
 

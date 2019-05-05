@@ -6,14 +6,16 @@ block content
     tr
       th(class='id') ID
       th(class='name') Name
-      th(class='wage') Monthly Wage
+      th(class='total-hours') Total Hours Worked
       th(class='overtime') Monthly Overtime (hrs)
+      th(class='wage') Monthly Wage
     each employee in data
       tr
         td(class='id')= employee.employeeId
         td(class='name')= employee.employeeName
-        td(class='wage')= employee.monthlyWage
+        td(class='total-hours')= employee.monthlyHours
         td(class='overtime')= employee.monthlyOvertime
+        td(class='wage')= employee.monthlyWage
       
       
 

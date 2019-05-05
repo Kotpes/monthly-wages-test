@@ -15,6 +15,7 @@ export type Employee = {
   employeeName: string,
   monthlyWage: string,
   monthlyOvertime: number,
+  monthlyHours: number
 }
 
 // TODO: Move helper functions into it's own file
@@ -128,6 +129,7 @@ export const handleData = (shifts: Array<Shift>) => {
 
     const monthlyTotalWage: Array<number> = []
     const monthlyTotalOvertimeHours: Array<number> = []
+    const monthlyTotalHours: Array<number> = []
 
     employeeShifts.forEach(({Date: shiftDate, Start: shiftStart, End: shiftEnd}) => {
       const splitDate = shiftDate.split('.')
@@ -156,16 +158,20 @@ export const handleData = (shifts: Array<Shift>) => {
 
       monthlyTotalWage.push(regularDailyWage.compensationForTheShift)
       monthlyTotalOvertimeHours.push(regularDailyWage.overtimeHours)
+      monthlyTotalHours.push(hoursWorked)
     })
 
     const monthlyWage = monthlyTotalWage.reduce((acc, cur) => acc + cur)
     const monthlyOvertime = monthlyTotalOvertimeHours.reduce((acc, cur) => acc + cur)
+    const monthlyHours = monthlyTotalHours.reduce((acc, cur) => acc + cur)
+    console.log(employeeShifts[0]['Person Name'], monthlyHours)
 
     employeeData.push({
       employeeId: id,
       employeeName: employeeShifts[0]['Person Name'],
       monthlyWage: formatter('en-US', 'USD').format(monthlyWage),
-      monthlyOvertime
+      monthlyOvertime,
+      monthlyHours
     })
   })
 

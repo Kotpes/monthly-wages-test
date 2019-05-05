@@ -12,6 +12,10 @@ body {
   width: 100%;
 }
 
+.wage-table tr:nth-child(odd) {
+  background-color: #eee;
+}
+
 .wage-table th {
   padding: 10px 5px;
   font-size: 18px;
@@ -21,13 +25,18 @@ body {
   font-size: 16px;
 }
 
+.wage-table td.wage {
+  font-weight: bold;
+}
+
 .wage-table .name,
 .wage-table .id {
   text-align: left;
 }
 
 .wage-table .wage,
-.wage-table .overtime {
+.wage-table .overtime,
+.wage-table .total-hours {
   text-align: right;
 }
 

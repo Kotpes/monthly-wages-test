@@ -13,14 +13,14 @@ const normalizeTime = (timeString) => {
     const minutes = splitTime[1];
     return `${hours}:${minutes}`;
 };
-const formatter = (locale, currency) => {
+exports.formatter = (locale, currency) => {
     return new Intl.NumberFormat(locale, {
         currency,
         minimumFractionDigits: 2,
         style: 'currency'
     });
 };
-const getOvertimeWageRate = (overtimeHours, baseRate) => {
+exports.getOvertimeWageRate = (overtimeHours, baseRate) => {
     const overtime = new Array(9);
     const hours = [];
     let rate = 0;
@@ -49,7 +49,7 @@ const getOvertimeWageRate = (overtimeHours, baseRate) => {
     // TODO: fix overtime rate for 3 and more time of overtime
     return rate;
 };
-const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
+exports.calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
     // Calculate regular hours pay
     const startingHour = get_hours_1.default(startDayTime);
     const endingHour = get_hours_1.default(endDateTime);
@@ -63,7 +63,7 @@ const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
     // Overtime case
     if (hoursWorked > 8) {
         overtimeHours = hoursWorked - 8;
-        overtimeCompensation = getOvertimeWageRate(overtimeHours, baseRate) * baseRate;
+        overtimeCompensation = exports.getOvertimeWageRate(overtimeHours, baseRate) * baseRate;
     }
     // Case where shift starts before 6
     if (startingHour < 6) {
@@ -105,6 +105,7 @@ exports.handleData = (shifts) => {
         });
         const monthlyTotalWage = [];
         const monthlyTotalOvertimeHours = [];
+        const monthlyTotalHours = [];
         employeeShifts.forEach(({ Date: shiftDate, Start: shiftStart, End: shiftEnd }) => {
             const splitDate = shiftDate.split('.');
             const year = splitDate[2];
@@ -122,17 +123,21 @@ exports.handleData = (shifts) => {
                 endDateTime = format_1.default(`${year}-${month}-${nextDay}T${endTime}`, 'YYYY-MM-DDTHH:mm');
             }
             const hoursWorked = difference_in_hours_1.default(endDateTime, startDayTime);
-            const regularDailyWage = calculateDailyWage(endDateTime, startDayTime, hoursWorked);
+            const regularDailyWage = exports.calculateDailyWage(endDateTime, startDayTime, hoursWorked);
             monthlyTotalWage.push(regularDailyWage.compensationForTheShift);
             monthlyTotalOvertimeHours.push(regularDailyWage.overtimeHours);
+            monthlyTotalHours.push(hoursWorked);
         });
         const monthlyWage = monthlyTotalWage.reduce((acc, cur) => acc + cur);
         const monthlyOvertime = monthlyTotalOvertimeHours.reduce((acc, cur) => acc + cur);
+        const monthlyHours = monthlyTotalHours.reduce((acc, cur) => acc + cur);
+        console.log(employeeShifts[0]['Person Name'], monthlyHours);
         employeeData.push({
             employeeId: id,
             employeeName: employeeShifts[0]['Person Name'],
-            monthlyWage: formatter('en-US', 'USD').format(monthlyWage),
-            monthlyOvertime
+            monthlyWage: exports.formatter('en-US', 'USD').format(monthlyWage),
+            monthlyOvertime,
+            monthlyHours
         });
     });
     //Sorting in ascending order

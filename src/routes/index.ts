@@ -4,7 +4,7 @@ import csv from 'csvtojson'
 import {handleData} from '../utils/helpers'
 import {Shift} from '../utils/helpers'
 
-const csvFilePath = path.join(__dirname, '../../../data/HourList.csv')
+const csvFilePath = path.join(__dirname, '../../data/HourList.csv')
 
 const router = express.Router()
 

@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const csvtojson_1 = __importDefault(require("csvtojson"));
 const helpers_1 = require("../utils/helpers");
-const csvFilePath = path_1.default.join(__dirname, '../../../data/HourList.csv');
+const csvFilePath = path_1.default.join(__dirname, '../../data/HourList.csv');
 const router = express_1.default.Router();
 /* GET home page. */
 router.get('/', (req, res) => {

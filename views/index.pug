@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h1(class='title')= title
+  table(class='wage-table')
+    tr
+      th(class='id') ID
+      th(class='name') Name
+      th(class='wage') Monthly Wage
+      th(class='overtime') Monthly Overtime (hrs)
+    each employee in data
+      tr
+        td(class='id')= employee.employeeId
+        td(class='name')= employee.employeeName
+        td(class='wage')= employee.monthlyWage
+        td(class='overtime')= employee.monthlyOvertime
+      
+      
+
+    

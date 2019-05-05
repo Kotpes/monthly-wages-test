@@ -13,5 +13,5 @@
     },
     "lib": ["es2015"]
   },
-  "include": ["**/*.ts", "**/*.tsx" ,"src/views/**/*.pug"]
+  "include": ["src/**/*.ts"]
 }

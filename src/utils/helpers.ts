@@ -90,7 +90,6 @@ const calculateDailyWage = (endDateTime: string, startDayTime: string, hoursWork
 }
 
 export const handleData = (shifts: Array<Shift>) => {
-  console.log(shifts)
   // Get list on unique employee id
   const uniqueIDs = [...new Set(shifts.map(shift => shift['Person ID']))]
 
@@ -143,6 +142,11 @@ export const handleData = (shifts: Array<Shift>) => {
       monthlyWage: formatter('en-US', 'USD').format(monthlyWage),
       monthlyOvertime
     })
+  })
+
+  //Sorting in ascending order
+  employeeData.sort((a,b) => {
+    return parseInt(a.employeeId, 10) - parseInt(b.employeeId, 10)
   })
 
   return employeeData

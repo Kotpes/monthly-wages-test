@@ -3,6 +3,30 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+.title {
+  margin-bottom: 40px;
+  font-size: 38px;
+}
+
+.wage-table {
+  width: 100%;
+}
+
+.wage-table th {
+  padding: 10px 5px;
+  font-size: 18px;
+}
+.wage-table td {
+  padding: 10px 5px;
+  font-size: 16px;
+}
+
+.wage-table .name,
+.wage-table .id {
+  text-align: left;
+}
+
+.wage-table .wage,
+.wage-table .overtime {
+  text-align: right;
 }

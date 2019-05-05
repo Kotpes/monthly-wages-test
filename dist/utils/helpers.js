@@ -70,7 +70,6 @@ const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
     return { compensationForTheShift, overtimeHours };
 };
 exports.handleData = (shifts) => {
-    console.log(shifts);
     // Get list on unique employee id
     const uniqueIDs = [...new Set(shifts.map(shift => shift['Person ID']))];
     const employeeData = [];
@@ -110,6 +109,10 @@ exports.handleData = (shifts) => {
             monthlyWage: formatter('en-US', 'USD').format(monthlyWage),
             monthlyOvertime
         });
+    });
+    //Sorting in ascending order
+    employeeData.sort((a, b) => {
+        return parseInt(a.employeeId, 10) - parseInt(b.employeeId, 10);
     });
     return employeeData;
 };

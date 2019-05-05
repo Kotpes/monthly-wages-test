@@ -21,8 +21,33 @@ const formatter = (locale, currency) => {
     });
 };
 const getOvertimeWageRate = (overtimeHours, baseRate) => {
+    const overtime = new Array(9);
+    const hours = [];
+    let rate = 0;
+    for (let i = 1; i <= overtime.length; i++) {
+        hours.push(i);
+    }
+    if (hours.length <= 3) {
+        //Overtime is 3 hours or less
+        return overtimeHours * (baseRate + (baseRate * 0.25));
+    }
+    else {
+        let hoursLeft = overtimeHours - 3;
+        //First, calculate rate for the first 3 hours
+        rate += 3 * (baseRate + (baseRate * 0.25));
+        if (hoursLeft > 1) {
+            //Calculate rate for the next hour and hours after      
+            rate += baseRate * 0.5;
+            hoursLeft - 1;
+            rate += hoursLeft * (baseRate + baseRate);
+        }
+        else {
+            //Case where total overtime was 4 hours
+            rate += baseRate * 0.5;
+        }
+    }
     // TODO: fix overtime rate for 3 and more time of overtime
-    return overtimeHours * baseRate * 0.25;
+    return rate;
 };
 const calculateDailyWage = (endDateTime, startDayTime, hoursWorked) => {
     // Calculate regular hours pay

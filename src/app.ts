@@ -52,4 +52,6 @@ app.use((err: Error, req, res: Res) => {
   res.render('error')
 })
 
+export default app
+
 app.listen(3000, () => console.log('App is running on port 3000!'))

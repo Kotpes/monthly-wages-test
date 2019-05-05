@@ -30,5 +30,6 @@ app.use((err, req, res) => {
     res.status(err.status || 500);
     res.render('error');
 });
+exports.default = app;
 app.listen(3000, () => console.log('App is running on port 3000!'));
 //# sourceMappingURL=app.js.map

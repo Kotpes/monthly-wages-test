@@ -18,4 +18,9 @@ Webapp will be accessible on `http://localhost:3000`.
 
 ## Developer's notes
 
-Used [Express generator](https://expressjs.com/en/starter/generator.html) to setup a basic express app with pug templating engine
+Used [Express generator](https://expressjs.com/en/starter/generator.html) to setup a basic express app
+
+[Jest](https://jestjs.io/en/) (together with [ts-node](https://github.com/TypeStrong/ts-node)) was chose for unit tests
+
+for the first time used [pug](https://pugjs.org/api/getting-started.html) templating engine, as setting up React or something felt like overkill for this task
+

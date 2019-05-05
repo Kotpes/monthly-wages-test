@@ -1,4 +1,5 @@
 import differenceInHours from 'date-fns/difference_in_hours'
+import differenceInMinutes from 'date-fns/difference_in_minutes'
 import format from 'date-fns/format'
 import getHours from 'date-fns/get_hours'
 
@@ -27,7 +28,7 @@ const normalizeTime = (timeString: string) => {
   return `${hours}:${minutes}`
 }
 
-export const formatter = (locale: string, currency: string) => {
+export const currencyFormatter = (locale: string, currency: string) => {
   return new Intl.NumberFormat(locale, {
     currency,
     minimumFractionDigits: 2,
@@ -36,16 +37,15 @@ export const formatter = (locale: string, currency: string) => {
 }
 
 export const getOvertimeWageRate = (overtimeHours: number, baseRate: number) => {
-  const overtime = new Array(9)
   const hours = []
   let rate = 0
-  for (let i = 1; i <= overtime.length; i++) {
+  for (let i = 1; i <= overtimeHours; i++) {
     hours.push(i)
   }
 
   if (hours.length <= 3) {
     //Overtime is 3 hours or less
-    return overtimeHours * (baseRate + (baseRate * 0.25))
+    rate = overtimeHours * (baseRate + (baseRate * 0.25))
   } else {
     let hoursLeft = overtimeHours - 3
     //First, calculate rate for the first 3 hours
@@ -61,11 +61,14 @@ export const getOvertimeWageRate = (overtimeHours: number, baseRate: number) => 
     }
   }
 
-  // TODO: fix overtime rate for 3 and more time of overtime
   return rate
 }
 
+/**
+ * endDateTime/startdate format: 2014-03-04T16:30
+ */
 export const calculateDailyWage = (endDateTime: string, startDayTime: string, hoursWorked: number) => {
+
   // Calculate regular hours pay
   const startingHour = getHours(startDayTime)
   const endingHour = getHours(endDateTime)
@@ -108,9 +111,9 @@ export const calculateDailyWage = (endDateTime: string, startDayTime: string, ho
   }
 
   const eveningHours = eveningBeforeSix + eveningAfterSeven
-  const eveningWorkCompensation = eveningHours * eveningWorkRate
+  const eveningWorkCompensation = eveningHours !== 0 ? (eveningHours * eveningWorkRate) : 0
   const regularDailyWage = regularDailyHours * baseRate
-  const compensationForTheShift = regularDailyWage + eveningWorkCompensation + overtimeCompensation
+  const compensationForTheShift = Math.round((regularDailyWage + eveningWorkCompensation + overtimeCompensation) * 100) / 100
 
   return {compensationForTheShift, overtimeHours}
 }
@@ -142,18 +145,18 @@ export const handleData = (shifts: Array<Shift>) => {
 
       const startDayTime = format(`${year}-${month}-${day}T${startTime}`, 'YYYY-MM-DDTHH:mm')
 
-      // At first, assume that it's the same date that shift ends
+      // At first, assume that shift starts and ends on the same date
       let endDateTime = format(`${year}-${month}-${day}T${endTime}`, 'YYYY-MM-DDTHH:mm')
 
       const shiftEndsNextDay = differenceInHours(endDateTime, startDayTime) < 0
 
+      //Move endDateTime to the next date if shift ends next day
       if (shiftEndsNextDay) {
-        // Here I assume that if it's the last day of the month, data will not contain the next day hours
         const nextDay = parseInt(day, 10) + 1
         endDateTime = format(`${year}-${month}-${nextDay}T${endTime}`, 'YYYY-MM-DDTHH:mm')
       }
 
-      const hoursWorked = differenceInHours(endDateTime, startDayTime)
+      const hoursWorked = differenceInMinutes(endDateTime, startDayTime) / 60
       const regularDailyWage = calculateDailyWage(endDateTime, startDayTime, hoursWorked)
 
       monthlyTotalWage.push(regularDailyWage.compensationForTheShift)
@@ -164,12 +167,12 @@ export const handleData = (shifts: Array<Shift>) => {
     const monthlyWage = monthlyTotalWage.reduce((acc, cur) => acc + cur)
     const monthlyOvertime = monthlyTotalOvertimeHours.reduce((acc, cur) => acc + cur)
     const monthlyHours = monthlyTotalHours.reduce((acc, cur) => acc + cur)
-    console.log(employeeShifts[0]['Person Name'], monthlyHours)
+    // console.log(employeeShifts[0]['Person Name'], monthlyTotalHours)
 
     employeeData.push({
       employeeId: id,
       employeeName: employeeShifts[0]['Person Name'],
-      monthlyWage: formatter('en-US', 'USD').format(monthlyWage),
+      monthlyWage: currencyFormatter('en-US', 'USD').format(monthlyWage),
       monthlyOvertime,
       monthlyHours
     })
